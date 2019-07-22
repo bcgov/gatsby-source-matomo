@@ -20,7 +20,7 @@ import Axios from 'axios';
 /**
  *
  * @param {Object} gatsbyHelpers the standard gatsby helpers
- * @param {Function} gatsbyHelpers.getNodes
+ * @param {Function} gatsbyHelpers.createContentDigest
  * @param {Function} gatsbyHelpers.createNodeId
  * @param {Object} gatsbyHelpers.actions
  * @param {Object} options
@@ -28,31 +28,50 @@ import Axios from 'axios';
  * @param {String} options.matomoUrl
  * @param {String} options.siteId
  */
-export const sourceNodes = async (gatsby, { matomoApiToken, matomoUrl, siteId, apiOptions }) => {
-  const { period, date } = apiOptions;
+export const sourceNodes = async (
+  { createNodeId, actions, createContentDigest },
+  { matomoApiToken, matomoUrl, siteId, apiOptions = {} },
+) => {
+  const { createNode } = actions;
+  const defaultApiOptions = {
+    period: 'month',
+    date: 'today',
+  };
+
+  const options = {
+    ...defaultApiOptions,
+    ...apiOptions,
+  };
   // working on a super implementation for version 0
   const url = `${matomoUrl}/index.php`;
 
-  const data = {
+  const params = {
     module: 'API',
     method: 'Actions.getPageUrls',
     idSubtable: 5,
     idSite: siteId,
-    period: period || 'month',
-    date: date || 'today',
     format: 'json',
     token_auth: matomoApiToken,
+    ...options,
   };
 
-  const response = await Axios.post(url, data);
+  const response = await Axios.post(url, null, { params: params });
 
-  console.log(response.data);
-  // $url .= "?module=API&method=UserCountry.getCountry";
-  // VisitsSummary
-  // .get (idSite, period, date, segment = '', columns = ''
-  /**
-   * $url .= "&idSite=62&period=month&date=today";
-$url .= "&format=JSON&filter_limit=10";
-$url .= "&token_auth=$token_auth";
-   */
+  // loop over page results and create nodes
+  response.data.forEach(page => {
+    const pageString = JSON.stringify(page);
+    const id = createNodeId(pageString);
+
+    createNode({
+      ...page,
+      id,
+      parent: null,
+      internal: {
+        type: 'MatomoPageStats',
+        children: [],
+        contentDigest: createContentDigest(page),
+        content: pageString,
+      },
+    });
+  });
 };
