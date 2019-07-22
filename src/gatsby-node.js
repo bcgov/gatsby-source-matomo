@@ -1,5 +1,5 @@
 import Axios from 'axios';
-
+import flatten from 'lodash';
 // Copyright © 2019 Province of British Columbia
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,7 +48,6 @@ export const sourceNodes = async (
   const params = {
     module: 'API',
     method: 'Actions.getPageUrls',
-    idSubtable: 5,
     idSite: siteId,
     format: 'json',
     token_auth: matomoApiToken,
@@ -56,9 +55,30 @@ export const sourceNodes = async (
   };
 
   const response = await Axios.post(url, null, { params: params });
+  // seperate out pages that have subtables
+  const pages = [];
+  const pagesToQueryBySubtable = [];
 
-  // loop over page results and create nodes
   response.data.forEach(page => {
+    if (!!page.idsubdatatable) {
+      pagesToQueryBySubtable.push(page);
+    } else {
+      pages.push(page);
+    }
+  });
+
+  // this functino should be recursive, if there are pages that have further idsubdatatables
+  // not implemented like so at this time!
+  const subTables = pagesToQueryBySubtable.map(async page => {
+    const response = await Axios.post(url, null, {
+      params: { ...params, idSubTable: page.idsubdatatable },
+    });
+    return response.data;
+  });
+
+  const data = await Promise.all(flatten(subTables));
+
+  data.concat(pages).forEach(page => {
     const pageString = JSON.stringify(page);
     const id = createNodeId(pageString);
 
@@ -75,3 +95,20 @@ export const sourceNodes = async (
     });
   });
 };
+
+const createNodeId = () => 'foo';
+const createContentDigest = () => 'foo';
+const actions = {
+  createNode: () => 'foo',
+};
+
+const options = {
+  matomoApiToken: '21c2d670ae130262324359b2453f3b08',
+  matomoUrl: 'https://matomo-devhub-prod.pathfinder.gov.bc.ca/',
+  siteId: 1,
+  apiOptions: {
+    period: 'year',
+  },
+};
+
+sourceNodes({ createNodeId, createContentDigest, actions }, options);
