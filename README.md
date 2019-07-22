@@ -54,6 +54,10 @@ The initial implementation default to getting page urls, this plus the overridab
 `apiOptions` field makes this plugin fairly flexible. I am happy to take PR's on extending the capability
 of this plugin
 
+- add support to recurse throw page urls. Matomo only provides page urls one section at a time. At this time we only support 1 level nested page paths.
+
+[ ] - https://mysite.com/path1/path2/path3
+[x] - https://mysite.com/path1/path2
 
 ## Disclaimer when overriding with ApiOptions
 
