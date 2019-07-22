@@ -1,5 +1,4 @@
 import Axios from 'axios';
-import flatten from 'lodash';
 // Copyright © 2019 Province of British Columbia
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -71,14 +70,18 @@ export const sourceNodes = async (
   // not implemented like so at this time!
   const subTables = pagesToQueryBySubtable.map(async page => {
     const response = await Axios.post(url, null, {
-      params: { ...params, idSubTable: page.idsubdatatable },
+      params: { ...params, idSubtable: page.idsubdatatable },
     });
     return response.data;
   });
 
-  const data = await Promise.all(flatten(subTables));
+  const data = await Promise.all(subTables);
 
-  data.concat(pages).forEach(page => {
+  const flattened = data.reduce((acc, elm) => {
+    return acc.concat(elm);
+  }, []);
+
+  flattened.concat(pages).forEach(page => {
     const pageString = JSON.stringify(page);
     const id = createNodeId(pageString);
 
@@ -95,20 +98,3 @@ export const sourceNodes = async (
     });
   });
 };
-
-const createNodeId = () => 'foo';
-const createContentDigest = () => 'foo';
-const actions = {
-  createNode: () => 'foo',
-};
-
-const options = {
-  matomoApiToken: '21c2d670ae130262324359b2453f3b08',
-  matomoUrl: 'https://matomo-devhub-prod.pathfinder.gov.bc.ca/',
-  siteId: 1,
-  apiOptions: {
-    period: 'year',
-  },
-};
-
-sourceNodes({ createNodeId, createContentDigest, actions }, options);
