@@ -31,6 +31,9 @@ export const sourceNodes = async (
   { createNodeId, actions, createContentDigest },
   { matomoApiToken, matomoUrl, siteId, apiOptions = {} },
 ) => {
+  console.log('====================================');
+  console.log('gatsby-source-matomo is moving!');
+  console.log('please install @bcgov/gatsby-source-matomo');
   const { createNode } = actions;
   const defaultApiOptions = {
     period: 'month',
