@@ -111,6 +111,5 @@ pipeline/build/
 
 /*.js 
 !index.js
-!postInstall.js
 constants
 utils
