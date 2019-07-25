@@ -1,6 +1,6 @@
 {
   "name": "@bcgov/gatsby-source-matomo",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Plugin that generates a set of nodes based off Matomo analytics",
   "engine": "node 10.15.3",
   "contributors": [
