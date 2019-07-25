@@ -8,14 +8,14 @@ Load page data as source nodes
 
 ## Quirks
 
-Although the Matomo API claims to be 'restful' it is far from that. For the initial implementation of this plugin,
-only page information is retrieved by default via the method `Action.getPageUrls` [api reference](https://developer.matomo.org/api-reference/reporting-api#Actions)
+Although the Matomo API claims to be 'restful', it is far from that. For the initial implementation of this plugin,
+only page information is retrieved by via default method `Action.getPageUrls` [api reference](https://developer.matomo.org/api-reference/reporting-api#Actions)
 
 This can be overridden to your liking with the `apiOptions` option
 
 ## To Use
 
-- Install `npm install --save gatsby-source-matomo`
+- Install `npm install --save @bcgov/gatsby-source-matomo`
 - Add to your gatsby config
 ```js
 {
@@ -54,10 +54,9 @@ The initial implementation default to getting page urls, this plus the overridab
 `apiOptions` field makes this plugin fairly flexible. I am happy to take PR's on extending the capability
 of this plugin
 
-- add support to recurse throw page urls. Matomo only provides page urls one section at a time. At this time we only support 1 level nested page paths.
+- add support to recurse through page urls. Matomo only provides page urls one section at a time. At this time we only support 1 level nested page paths.
 
-[ ] - https://mysite.com/path1/path2/path3
-[x] - https://mysite.com/path1/path2
+ - https://mysite.com/path1/path2/path3 > will not get path3 stats
 
 ## Disclaimer when overriding with ApiOptions
 

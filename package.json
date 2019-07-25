@@ -1,6 +1,6 @@
 {
-  "name": "gatsby-source-matomo",
-  "version": "0.0.4-1",
+  "name": "@bcgov/gatsby-source-matomo",
+  "version": "0.0.2",
   "description": "Plugin that generates a set of nodes based off Matomo analytics",
   "engine": "node 10.15.3",
   "contributors": [
@@ -26,8 +26,7 @@
     "test:watch": "NODE_ENV=test jest __tests__ --watch --env=node",
     "test:lint": "eslint --env node --ext .js src",
     "prettier": "prettier --write '{./,__{tests,mocks}__}/**/*.+(js|jsx)'",
-    "prepare": "npm run test:lint -- --fix && npm run build",
-    "postinstall": "node postInstall.js"
+    "prepare": "npm run test:lint -- --fix && npm run build"
   },
   "author": "Patrick Simonian",
   "license": "Apache-2.0",
