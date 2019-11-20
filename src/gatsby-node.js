@@ -91,7 +91,6 @@ export const sourceNodes = async (
       parent: null,
       internal: {
         type: 'MatomoPageStats',
-        children: [],
         contentDigest: createContentDigest(page),
         content: pageString,
       },
