@@ -54,46 +54,50 @@ export const sourceNodes = async (
   };
 
   const response = await Axios.post(url, null, { params: params });
-  // seperate out pages that have subtables
-  const pages = [];
-  const pagesToQueryBySubtable = [];
+  // separate out pages that have subtables
+  if (response.data) {
+    const pages = [];
+    const pagesToQueryBySubtable = [];
 
-  response.data.forEach(page => {
-    if (!!page.idsubdatatable) {
-      pagesToQueryBySubtable.push(page);
-    } else {
-      pages.push(page);
-    }
-  });
-
-  // this functino should be recursive, if there are pages that have further idsubdatatables
-  // not implemented like so at this time!
-  const subTables = pagesToQueryBySubtable.map(async page => {
-    const response = await Axios.post(url, null, {
-      params: { ...params, idSubtable: page.idsubdatatable },
+    response.data.forEach(page => {
+      if (!!page.idsubdatatable) {
+        pagesToQueryBySubtable.push(page);
+      } else {
+        pages.push(page);
+      }
     });
-    return response.data;
-  });
 
-  const data = await Promise.all(subTables);
-
-  const flattened = data.reduce((acc, elm) => {
-    return acc.concat(elm);
-  }, []);
-
-  flattened.concat(pages).forEach(page => {
-    const pageString = JSON.stringify(page);
-    const id = createNodeId(pageString);
-
-    createNode({
-      ...page,
-      id,
-      parent: null,
-      internal: {
-        type: 'MatomoPageStats',
-        contentDigest: createContentDigest(page),
-        content: pageString,
-      },
+    // this functino should be recursive, if there are pages that have further idsubdatatables
+    // not implemented like so at this time!
+    const subTables = pagesToQueryBySubtable.map(async page => {
+      const response = await Axios.post(url, null, {
+        params: { ...params, idSubtable: page.idsubdatatable },
+      });
+      return response.data;
     });
-  });
+
+    const data = await Promise.all(subTables);
+
+    const flattened = data.reduce((acc, elm) => {
+      return acc.concat(elm);
+    }, []);
+
+    flattened.concat(pages).forEach(page => {
+      const pageString = JSON.stringify(page);
+      const id = createNodeId(pageString);
+
+      createNode({
+        ...page,
+        id,
+        parent: null,
+        internal: {
+          type: 'MatomoPageStats',
+          contentDigest: createContentDigest(page),
+          content: pageString,
+        },
+      });
+    });
+  } else {
+    console.error(`Matomo returned with zero results from method ${params.method}`);
+  }
 };
